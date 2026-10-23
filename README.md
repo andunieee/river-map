@@ -6,8 +6,9 @@ hard to visualize them.
 
 So this is a map with just rivers on it. Zoomed out, you see the big ones,
 like the Amazon, the Nile, the Danube and the Mississippi. Zoom in and smaller
-rivers appear. Hover over or tap any river to light it up from source to mouth
-and see its name.
+rivers appear. Hover over any river to light it up from source to mouth and
+see its name. Click or tap it to read about it on Wikipedia, or search for a
+river by name to find it on the map.
 
 ![The whole world with the major rivers](screenshots/world.png)
 
@@ -31,4 +32,5 @@ python3 -m http.server 8000 --directory public
 
 Then open http://localhost:8000.
 
-River data comes from [Natural Earth](https://www.naturalearthdata.com/).
+River data comes from [Natural Earth](https://www.naturalearthdata.com/);
+river summaries come from [Wikipedia](https://en.wikipedia.org/).

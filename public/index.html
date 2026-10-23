@@ -4,23 +4,40 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Rivers of the World</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Cpath d='M4 6c8 0 6 10 14 10s6 10 10 10' fill='none' stroke='%233a86c4' stroke-width='4' stroke-linecap='round'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.css">
   <link rel="stylesheet" href="style.css">
 </head>
 <body>
   <div id="map"></div>
-  <div id="title" tabindex="0">
-    <h1>Rivers of the World <span class="info-icon" aria-hidden="true">i</span></h1>
-    <div class="details">
-      <p>Zoom in to see smaller rivers. Hover over or tap a river to see its name.</p>
-      <p class="credits">
-        River, lake and land data from <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>.
-        Map rendered with <a href="https://maplibre.org/" target="_blank" rel="noopener">MapLibre</a>,
-        label fonts from <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a>.
-      </p>
-      <p><a href="https://github.com/andunieee/river-map" target="_blank" rel="noopener">Source code on GitHub</a></p>
+  <div id="topleft">
+    <div id="title" tabindex="0">
+      <h1>Rivers of the World <span class="info-icon" aria-hidden="true">i</span></h1>
+      <div class="details">
+        <p>Zoom in to see smaller rivers. Hover over a river to see its name, click or tap it for more.</p>
+        <p class="credits">
+          River, lake and land data from <a href="https://www.naturalearthdata.com/" target="_blank" rel="noopener">Natural Earth</a>.
+          Map rendered with <a href="https://maplibre.org/" target="_blank" rel="noopener">MapLibre</a>,
+          label fonts from <a href="https://openfreemap.org/" target="_blank" rel="noopener">OpenFreeMap</a>.
+          River summaries from <a href="https://en.wikipedia.org/" target="_blank" rel="noopener">Wikipedia</a>,
+          matched using <a href="https://www.wikidata.org/" target="_blank" rel="noopener">Wikidata</a>.
+        </p>
+        <p><a href="https://github.com/andunieee/river-map" target="_blank" rel="noopener">Source code on GitHub</a></p>
+      </div>
+    </div>
+    <div id="search">
+      <input id="search-input" type="search" placeholder="Search rivers…" autocomplete="off"
+             role="combobox" aria-label="Search rivers" aria-controls="search-results" aria-expanded="false">
+      <ul id="search-results" role="listbox" hidden></ul>
     </div>
   </div>
+  <aside id="panel" hidden>
+    <button class="close" aria-label="Close">×</button>
+    <h2 class="name"></h2>
+    <p class="alt"></p>
+    <button class="zoom">Zoom to river</button>
+    <div class="wiki"></div>
+  </aside>
   <div id="tooltip" hidden></div>
   <div id="loading">Loading rivers…</div>
   <script src="https://unpkg.com/maplibre-gl@5.24.0/dist/maplibre-gl.js"></script>

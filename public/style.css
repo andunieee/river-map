@@ -4,19 +4,27 @@ html, body, #map {
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
-/* Collapsed to the title; expands on hover, keyboard focus, or tap (.open). */
-#title {
+#topleft {
   position: absolute;
   top: 12px;
   left: 12px;
-  max-width: 260px;
+  width: 280px;
+  max-width: calc(100% - 24px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
+  z-index: 3;
+}
+
+/* Collapsed to the title; expands on hover, keyboard focus, or tap (.open). */
+#title {
   padding: 6px 12px;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
   cursor: default;
   outline: none;
-  z-index: 3;
 }
 
 #title h1 {
@@ -105,16 +113,189 @@ html, body, #map {
   font-style: italic;
 }
 
-/* On touch screens the name shows in a card at the bottom instead. */
-#tooltip.card {
-  left: 50% !important;
-  top: auto !important;
-  bottom: 28px;
-  transform: translateX(-50%);
-  padding: 10px 16px;
-  font-size: 16px;
+/* --- Search --- */
+
+#search {
+  position: relative;
+  width: 100%;
+}
+
+#search-input {
+  box-sizing: border-box;
+  width: 100%;
+  padding: 8px 12px;
+  font: inherit;
+  font-size: 14px;
+  border: 1px solid #c9d6df;
+  border-radius: 8px;
+  background: rgba(255, 255, 255, 0.95);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
+  outline: none;
+}
+
+#search-input:focus {
+  border-color: #3a86c4;
+}
+
+#search-results {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  margin: 0;
+  padding: 4px 0;
+  list-style: none;
+  background: #fff;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+}
+
+#search-results li {
+  display: flex;
+  flex-direction: column;
+  padding: 6px 12px;
+  cursor: pointer;
+}
+
+#search-results li[aria-selected="true"],
+#search-results li:hover {
+  background: #eaf2f8;
+}
+
+#search-results .result-name {
+  font-size: 14px;
+  color: #1d2b36;
+}
+
+#search-results .result-detail {
+  font-size: 12px;
+  color: #6b7a86;
+}
+
+#search-results .empty {
+  color: #6b7a86;
+  font-size: 13px;
+  cursor: default;
+}
+
+/* --- River info panel --- */
+
+#panel {
+  position: absolute;
+  top: 12px;
+  right: 12px;
+  width: 340px;
+  max-height: calc(100% - 120px);
+  overflow-y: auto;
+  box-sizing: border-box;
+  padding: 14px 16px 16px;
+  background: #fff;
   border-radius: 10px;
-  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.2);
+  font-size: 14px;
+  color: #333;
+  z-index: 4;
+}
+
+#panel[hidden] {
+  display: none;
+}
+
+#panel .close {
+  position: absolute;
+  top: 6px;
+  right: 8px;
+  border: none;
+  background: none;
+  font-size: 22px;
+  line-height: 1;
+  color: #777;
+  cursor: pointer;
+}
+
+#panel .name {
+  margin: 0 24px 2px 0;
+  font-size: 19px;
+  color: #1d4e75;
+}
+
+#panel .alt {
+  margin: 0 0 4px;
+  font-size: 13px;
+  font-style: italic;
+  color: #6b7a86;
+}
+
+#panel .zoom {
+  margin: 6px 0 10px;
+  padding: 4px 10px;
+  font: inherit;
+  font-size: 12px;
+  color: #1d6fa8;
+  background: #eaf2f8;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+#panel .wiki {
+  border-top: 1px solid #e5e9ec;
+  padding-top: 10px;
+}
+
+#panel .thumb {
+  display: block;
+  width: 100%;
+  max-height: 180px;
+  object-fit: cover;
+  border-radius: 6px;
+  margin-bottom: 8px;
+}
+
+#panel h3 {
+  margin: 0;
+  font-size: 15px;
+}
+
+#panel .desc {
+  margin: 2px 0 8px;
+  font-size: 12px;
+  color: #6b7a86;
+}
+
+#panel .extract {
+  margin: 0 0 8px;
+  line-height: 1.45;
+}
+
+#panel .more,
+#panel .muted a {
+  color: #1d6fa8;
+}
+
+#panel .muted {
+  margin: 0;
+  color: #6b7a86;
+}
+
+/* Phones: the panel becomes a sheet along the bottom. */
+@media (max-width: 600px) {
+  #panel {
+    top: auto;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    width: auto;
+    max-height: 50%;
+    border-radius: 14px 14px 0 0;
+  }
+
+  #panel .thumb {
+    float: right;
+    width: 96px;
+    height: 96px;
+    margin: 0 0 6px 10px;
+  }
 }
 
 #loading {
