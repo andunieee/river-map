@@ -4,28 +4,87 @@ html, body, #map {
   font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
 }
 
+/* Collapsed to the title; expands on hover, keyboard focus, or tap (.open). */
 #title {
   position: absolute;
   top: 12px;
   left: 12px;
   max-width: 260px;
-  padding: 10px 14px;
+  padding: 6px 12px;
   background: rgba(255, 255, 255, 0.9);
   border-radius: 8px;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.15);
-  pointer-events: none;
+  cursor: default;
+  outline: none;
+  z-index: 3;
 }
 
 #title h1 {
-  margin: 0 0 4px;
-  font-size: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 15px;
   color: #1d4e75;
 }
 
-#title .hint {
-  margin: 0;
+#title .info-icon {
+  display: inline-grid;
+  place-items: center;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #1d4e75;
+  color: #fff;
+  font: italic bold 11px Georgia, serif;
+}
+
+#title .details {
+  display: none;
   font-size: 12px;
   color: #555;
+}
+
+#title .details p {
+  margin: 8px 0 0;
+}
+
+#title .credits {
+  color: #777;
+}
+
+#title a {
+  color: #1d6fa8;
+}
+
+#title.open {
+  padding: 10px 14px;
+}
+
+#title.open .details {
+  display: block;
+}
+
+#title.open .info-icon {
+  display: none;
+}
+
+/* Only real hover devices; phones keep a sticky :hover after a tap. */
+@media (hover: hover) {
+  #title:hover,
+  #title:focus-within {
+    padding: 10px 14px;
+  }
+
+  #title:hover .details,
+  #title:focus-within .details {
+    display: block;
+  }
+
+  #title:hover .info-icon,
+  #title:focus-within .info-icon {
+    display: none;
+  }
 }
 
 #tooltip {

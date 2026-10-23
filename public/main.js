@@ -179,3 +179,17 @@ map.on('click', (e) => {
   const f = riverAt(e.point, 12);
   f ? show(f, e.point) : hide();
 });
+
+// --- Info box ----------------------------------------------------------------
+
+// Touch screens can't hover, so tapping the box toggles it instead.
+const infoBox = document.getElementById('title');
+infoBox.addEventListener('click', (e) => {
+  if (!isTouch || e.target.closest('a')) return;
+  if (infoBox.classList.toggle('open')) return;
+  infoBox.blur();
+});
+map.on('click', () => {
+  infoBox.classList.remove('open');
+  infoBox.blur();
+});
