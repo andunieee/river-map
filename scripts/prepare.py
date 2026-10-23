@@ -8,12 +8,16 @@ Outputs:
   land50.geojson  coarse land polygons for the world view
   land.geojson    detailed land polygons (10m, rounded to ~1 km)
   lakes.geojson   lake polygons with mz
-  labels.geojson  one point per river for low-zoom labels
+  labels.geojson  one point per river: low-zoom labels, search index and
+                  river info (bbox, alternative names, Wikidata id)
+
+Run scripts/wikidata.py afterwards to link rivers to Wikipedia.
 """
 
 import json
 import math
 import sys
+from collections import Counter
 from pathlib import Path
 
 RIVER_FILES = [
@@ -77,6 +81,7 @@ def build_rivers(raw):
                 continue
             local = p.get("name") or ""
             name = p.get("name_en") or local
+            alt = p.get("name_alt") or ""
             sr = int(float(p.get("scalerank") or 12))
             lines = [round_coords(l, 3) for l in lines_of(g)]
             lines = [l for l in lines if len(l) >= 2]
@@ -89,6 +94,8 @@ def build_rivers(raw):
                 "mz": min_zoom(p),
                 "lake": "Lake" in (p.get("featurecla") or ""),
                 "lines": lines,
+                "alt": alt if alt not in (name, local) else "",
+                "wd": p.get("wikidataid") or "",
             })
 
     # Group connected segments sharing a name into one river (rid), so the
@@ -114,8 +121,23 @@ def build_rivers(raw):
                         for j in grid.get((s["name"], cx + dx, cy + dy), ()):
                             uf.union(i, j)
 
+    # Per-river info for the labels file, kept out of rivers.geojson so the
+    # big file stays small.
+    meta = {}
     features = []
     for i, s in enumerate(segs):
+        if s["name"]:
+            m = meta.setdefault(uf.find(i), {"alt": set(), "wd": Counter(),
+                                             "bbox": [180, 90, -180, -90]})
+            if s["alt"]:
+                m["alt"].add(s["alt"])
+            if s["wd"]:
+                m["wd"][s["wd"]] += 1
+            b = m["bbox"]
+            for line in s["lines"]:
+                for x, y in line:
+                    b[0], b[1] = min(b[0], x), min(b[1], y)
+                    b[2], b[3] = max(b[2], x), max(b[3], y)
         geom = ({"type": "LineString", "coordinates": s["lines"][0]}
                 if len(s["lines"]) == 1 else
                 {"type": "MultiLineString", "coordinates": s["lines"]})
@@ -130,7 +152,7 @@ def build_rivers(raw):
         features.append({"type": "Feature", "properties": props, "geometry": geom})
     # Big rivers last so they draw on top.
     features.sort(key=lambda f: -f["properties"]["sr"])
-    return features
+    return features, meta
 
 
 def line_length(line):
@@ -152,7 +174,7 @@ def point_along(line, frac):
     return line[-1]
 
 
-def build_labels(rivers):
+def build_labels(rivers, meta):
     """One label point per river, partway along its longest stretch.
 
     Text along wiggly lines fails to place at low zoom, so the map uses these
@@ -179,7 +201,14 @@ def build_labels(rivers):
     for g in groups.values():
         # Label priority: rank first, then longer rivers beat short delta
         # channels and side branches of the same rank.
-        g["props"]["prio"] = round(g["props"]["sr"] * 100 - min(g["total"], 99), 1)
+        props = g["props"]
+        props["prio"] = round(props["sr"] * 100 - min(g["total"], 99), 1)
+        m = meta[props["rid"]]
+        props["bbox"] = m["bbox"]
+        if m["alt"]:
+            props["alt"] = sorted(m["alt"])
+        if m["wd"]:
+            props["wd"] = m["wd"].most_common(1)[0][0]
         # 0.4 rather than 0.5 nudges labels off the confluences that often
         # sit mid-line.
         out.append({"type": "Feature", "properties": g["props"],
@@ -213,9 +242,9 @@ def write(path, features):
 def main():
     raw, out = Path(sys.argv[1]), Path(sys.argv[2])
     out.mkdir(parents=True, exist_ok=True)
-    rivers = build_rivers(raw)
+    rivers, meta = build_rivers(raw)
     write(out / "rivers.geojson", rivers)
-    write(out / "labels.geojson", build_labels(rivers))
+    write(out / "labels.geojson", build_labels(rivers, meta))
     write(out / "land50.geojson", build_polys(raw, "ne_50m_land", 2))
     write(out / "land.geojson", build_polys(raw, "ne_10m_land", 2))
     write(out / "lakes.geojson", build_polys(raw, "ne_10m_lakes", 2, keep_mz=True))
